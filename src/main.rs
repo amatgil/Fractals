@@ -2,24 +2,10 @@ use std::f64::consts::TAU;
 
 use ppmitzador::*;
 
-const BG: Pixel = Pixel::BLACK;
-
-//fn draw_koch_line(img: &mut ImagePPM, n: usize, start: Coord, end: Coord) {
-//    if n == 1 { img.draw_line(start, end) }
-//    else {
-//        let node1 = lerp_c(start, end, 0.3);
-//        let node2 = lerp_c(start, end, 0.6);
-//
-//        img.draw_line(img, start, node1);
-//
-//        img.draw_line(img, node2, end);
-//    }
-//}
-//
-//fn lerp(a: usize, b: usize, t: f64) -> usize {
-//    a*(1 - t) + b*t
-//}
-//
+const BG: Pixel     = Pixel::BLACK;
+const WIDTH: usize  = 10000;
+const HEIGHT: usize = WIDTH;
+const ANTI: bool    = false;
 
 fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
     // x
@@ -30,16 +16,14 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
 }
 
 fn main() {
-    let n = 2;
-    let width = 100;
-    let height = width;
-    let mut data = ImagePPM::new(width, height, BG);
+    let n = 7;
+    let mut data = ImagePPM::new(WIDTH, HEIGHT, BG);
 
     let mut points = vec![
-        Coord { x: 1*width/4, y: 1*height / 4 },
-        Coord { x: 2*width/4, y: 3*height / 4 },
-        Coord { x: 3*width/4, y: 1*height / 4 },
-        Coord { x: 1*width/4, y: 1*height / 4 }, // repetida pel cicle
+        Coord { x: 1*WIDTH/4, y: 1*HEIGHT / 4 },
+        Coord { x: 2*WIDTH/4, y: 3*HEIGHT / 4 },
+        Coord { x: 3*WIDTH/4, y: 1*HEIGHT / 4 },
+        Coord { x: 1*WIDTH/4, y: 1*HEIGHT / 4 }, // repetida pel cicle
     ];
 
     for _ in 0..n {
@@ -47,7 +31,7 @@ fn main() {
         
         for pair in points.windows(2) {
             //        d
-            //       / \
+            //       / \            <- Koch pattern
             // a -- c   e -- b
             let a = pair[0];
             let b = pair[1];
@@ -65,7 +49,7 @@ fn main() {
                 let dx = x2 - x1;
                 let dy = y2 - y1;
 
-                let theta = -TAU/6.0; // 60ª
+                let theta = TAU/6.0 * if ANTI { 1.0 } else { -1.0 }; // 60ª
 
                 let rx = x1 +    theta.cos()*dx + theta.sin()*dy;
                 let ry = y1 + (-theta).sin()*dx + theta.cos()*dy;
@@ -81,7 +65,6 @@ fn main() {
 
     
         }
-        dbg!(points);
         points = new_points
     }
 
