@@ -2,10 +2,11 @@ use std::f64::consts::TAU;
 
 use ppmitzador::*;
 
-const BG: Pixel     = Pixel::BLACK;
-const WIDTH: usize  = 10000;
-const HEIGHT: usize = WIDTH;
-const ANTI: bool    = false;
+const BG: Pixel        = Pixel::BLACK;
+const TRI_COLOR: Pixel = Pixel::WHITE;
+const WIDTH: usize     = 1000;
+const HEIGHT: usize    = WIDTH;
+const ANTI: bool       = false;
 
 fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
     // x
@@ -16,7 +17,7 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
 }
 
 fn main() {
-    let n = 7;
+    let n = 1;
     let mut data = ImagePPM::new(WIDTH, HEIGHT, BG);
 
     let mut points = vec![
@@ -30,6 +31,7 @@ fn main() {
         let mut new_points = vec![];
         
         for pair in points.windows(2) {
+            println!("Doing pair: {pair:?}");
             //        d
             //       / \            <- Koch pattern
             // a -- c   e -- b
@@ -68,13 +70,13 @@ fn main() {
         points = new_points
     }
 
+    for pair in points.windows(2) { data.draw_line_with_thickness(pair[0], pair[1], TRI_COLOR, 10); }
 
+    //data.draw_circle(Coord { x: WIDTH / 2, y: HEIGHT / 2 }, 100, Pixel::PURPLE);
 
-    for p in points {
-        *data.get_mut(p.x, p.y).unwrap() = Pixel::WHITE;
-    }
-
+    println!("Saving to file");
     data.save_to_file("testing.ppm").unwrap();
+    println!("Saved");
 
     println!("Finished");
 }
