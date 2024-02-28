@@ -18,15 +18,14 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
 fn save_flake(n: usize, anti: bool) {
     println!("[INFO]: Initializing...");
     let mut data = ImagePPM::new(WIDTH, HEIGHT, BG);
-
-    let lowest  = (0.5 - (3.0 as f64).sqrt()/12.0)*(HEIGHT as f64);
-    let highest = lowest + (3.0 as f64).sqrt()*(HEIGHT as f64)/4.0;
+    let lowest_y  = (0.5 - (3.0 as f64).sqrt()/12.0)*(HEIGHT as f64);
+    let highest_y = lowest_y + (3.0 as f64).sqrt()*(HEIGHT as f64)/4.0;
 
     let mut points = vec![
-        Coord { x: 1*WIDTH/4, y: lowest  as usize},
-        Coord { x: 2*WIDTH/4, y: highest as usize},
-        Coord { x: 3*WIDTH/4, y: lowest  as usize},
-        Coord { x: 1*WIDTH/4, y: lowest  as usize}, // repetida pel cicle
+        Coord { x: 1*WIDTH/4, y: lowest_y  as usize},
+        Coord { x: 2*WIDTH/4, y: highest_y as usize},
+        Coord { x: 3*WIDTH/4, y: lowest_y  as usize},
+        Coord { x: 1*WIDTH/4, y: lowest_y  as usize}, // repetida pel cicle
     ];
 
     println!("[INFO]: Starting computations...");
