@@ -2,8 +2,6 @@ use std::f64::consts::TAU;
 
 use ppmitzador::*;
 
-const BG: Pixel        = Pixel::BLACK;
-const TRI_COLOR: Pixel = Pixel::WHITE;
 const WIDTH: usize     = 2000;
 const HEIGHT: usize    = WIDTH;
 const THETA: f64       = TAU/6.0;
@@ -17,10 +15,14 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
 
 fn save_flake(n: usize, anti: bool) {
     println!("[INFO]: Initializing...");
+<<<<<<< HEAD
     let mut data = ImagePPM::new(WIDTH, HEIGHT, BG);
     let lowest_y  = (0.5 - (3.0 as f64).sqrt()/12.0)*(HEIGHT as f64);
     let highest_y = lowest_y + (3.0 as f64).sqrt()*(HEIGHT as f64)/4.0;
 
+=======
+    let mut data = ImagePBM::new(WIDTH, HEIGHT, false);
+>>>>>>> 5585ae719f149bfb14baaacbd8a8dd6fb952197f
     let mut points = vec![
         Coord { x: 1*WIDTH/4, y: lowest_y  as usize},
         Coord { x: 2*WIDTH/4, y: highest_y as usize},
@@ -68,8 +70,13 @@ fn save_flake(n: usize, anti: bool) {
     }
     println!("[INFO]: Drawing lines...");
 
+<<<<<<< HEAD
     for pair in points.windows(2) { data.draw_line_with_thickness(pair[0], pair[1], TRI_COLOR, 2); }
     
+=======
+    for pair in points.windows(2) { data.draw_line_with_thickness(pair[0], pair[1], true, 2); }
+
+>>>>>>> 5585ae719f149bfb14baaacbd8a8dd6fb952197f
 
     println!("[INFO]: Saving to file...");
     let filename = format!("koch-n{:0>2}-anti{anti}.ppm", n);
