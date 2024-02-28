@@ -37,6 +37,8 @@ fn save_flake(n: usize, anti: bool) {
             //        d
             //       / \            <- Koch pattern
             // a -- c   e -- b
+            //
+            // Here, theta is the angle fomed by the segments c-d and d-e 
 
             let a = pair[0];
             let b = pair[1];
@@ -44,19 +46,20 @@ fn save_flake(n: usize, anti: bool) {
             let c = lerp_c(a, b,       0.5/(1.0 + (THETA/2.0).sin()));
             let e = lerp_c(a, b, 1.0 - 0.5/(1.0 + (THETA/2.0).sin()));
 
-            // raise |c-a| units above the midpoint of a, b 
+            // place d |c-a|*cos(theta/2) units above the midpoint of a, b 
             let d = { 
 
-                //find the midpoint of a and b
-                let aux = lerp_c(a, b, 0.5);
+                // find the midpoint of a and b
+                let mid = lerp_c(a, b, 0.5);
                 
-                //find vector from a to c
+                // find vector from a to c
                 let ca_vec_x = (c.x as f64 - a.x as f64)*if anti {-1.0} else {1.0};
                 let ca_vec_y = (c.y as f64 - a.y as f64)*if anti {-1.0} else {1.0};
                 
-                //place d |c-a| units perpendicular to the c-a vector
-                let dx = aux.x as f64 - (THETA/2.0).cos()*(ca_vec_y as f64);
-                let dy = aux.y as f64 + (THETA/2.0).cos()*(ca_vec_x as f64);
+                // place d |c-a|*cos(theta/2) units perpendicular to the c-a vector
+                // this comes from the c-d-mid right angle triangle where |d-c| = |c-a|
+                let dx = mid.x as f64 - (THETA/2.0).cos()*(ca_vec_y as f64);
+                let dy = mid.y as f64 + (THETA/2.0).cos()*(ca_vec_x as f64);
                 
                 Coord { x: dx as usize, y: dy as usize}
             };
