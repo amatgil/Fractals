@@ -1,6 +1,9 @@
 # (Anti) Koch Snowflake generator
 
-This Rust program generates simple (Anti) Koch snowflakes from the commandline in the [Netpbm format](https://en.wikipedia.org/wiki/Netpbm).
+This Rust program generates simple (Anti) Koch snowflakes from the commandline in the
+[Netpbm format](https://en.wikipedia.org/wiki/Netpbm).
+
+Mutiple examples of the output are laid out in atlas/texturemap form in the [atlas.png](atlas.png) file.
 
 ## Table of Contents
 
