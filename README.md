@@ -14,7 +14,7 @@ Mutiple examples of the output are laid out in atlas/texturemap form in the [atl
 
 ## Introduction
 
-The [Koch Snowflake](https://en.wikipedia.org/wiki/Koch_snowflake) is a fractal named after Helge von Koch. It is formed by iteratively subdividing an equilateral triangle's sides into smaller equilateral triangles. This program provides a simple and customizable way to draw both versoins of it.
+The [Koch Snowflake](https://en.wikipedia.org/wiki/Koch_snowflake) is a fractal named after Helge von Koch. It is formed by iteratively subdividing an equilateral triangle's sides into smaller equilateral triangles. This program provides a simple and customizable way to draw both verisons of it.
 
 The AntiSnowflake is obtained by rotating -τ/6 radians instead of τ/6 (easily visible in the code).
 
@@ -47,4 +47,4 @@ covert your_file.ppm out.png
 
 ## License
 
-This project and all files contained therein and licensed under the [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.txt) license (see COPYING file).
+This project and all files contained therein and licensed under the [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.txt) license (see [COPYING](COPYING) file).
