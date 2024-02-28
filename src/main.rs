@@ -2,8 +2,6 @@ use std::f64::consts::TAU;
 
 use ppmitzador::*;
 
-const BG: Pixel        = Pixel::BLACK;
-const TRI_COLOR: Pixel = Pixel::WHITE;
 const WIDTH: usize     = 2000;
 const HEIGHT: usize    = WIDTH;
 
@@ -16,7 +14,7 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
 
 fn save_flake(n: usize, anti: bool) {
     println!("[INFO]: Initializing...");
-    let mut data = ImagePPM::new(WIDTH, HEIGHT, BG);
+    let mut data = ImagePBM::new(WIDTH, HEIGHT, false);
     let mut points = vec![
         Coord { x: 1*WIDTH/4, y: 1*HEIGHT / 4 },
         Coord { x: 2*WIDTH/4, y: 3*HEIGHT / 4 },
@@ -61,7 +59,7 @@ fn save_flake(n: usize, anti: bool) {
     }
     println!("[INFO]: Drawing lines...");
 
-    for pair in points.windows(2) { data.draw_line_with_thickness(pair[0], pair[1], TRI_COLOR, 2); }
+    for pair in points.windows(2) { data.draw_line_with_thickness(pair[0], pair[1], true, 2); }
 
 
     println!("[INFO]: Saving to file...");
