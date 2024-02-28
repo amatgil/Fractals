@@ -18,12 +18,15 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
 fn save_flake(n: usize, anti: bool) {
     println!("[INFO]: Initializing...");
     let mut data = ImagePPM::new(WIDTH, HEIGHT, BG);
-    let tr_h = ((3.0 as f64).sqrt() + 1.0)*(HEIGHT as f64)/4.0;
+
+    let lowest  = (0.5 - (3.0 as f64).sqrt()/12.0)*(HEIGHT as f64);
+    let highest = lowest + (3.0 as f64).sqrt()*(HEIGHT as f64)/4.0;
+
     let mut points = vec![
-        Coord { x: 1*WIDTH/4, y: 1*HEIGHT / 4 },
-        Coord { x: 2*WIDTH/4, y: tr_h as usize},
-        Coord { x: 3*WIDTH/4, y: 1*HEIGHT / 4 },
-        Coord { x: 1*WIDTH/4, y: 1*HEIGHT / 4 }, // repetida pel cicle
+        Coord { x: 1*WIDTH/4, y: lowest  as usize},
+        Coord { x: 2*WIDTH/4, y: highest as usize},
+        Coord { x: 3*WIDTH/4, y: lowest  as usize},
+        Coord { x: 1*WIDTH/4, y: lowest  as usize}, // repetida pel cicle
     ];
 
     println!("[INFO]: Starting computations...");
@@ -50,6 +53,7 @@ fn save_flake(n: usize, anti: bool) {
                 let temp = aux.x as f64 - (THETA/2.0).cos()*(dy as f64);
                 let dy   = aux.y as f64 + (THETA/2.0).cos()*(dx as f64);
                 let dx   = temp;
+                
                 Coord { x: dx as usize, y: dy as usize}
             };
             new_points.extend([a, c, d, e, b]);
@@ -59,7 +63,7 @@ fn save_flake(n: usize, anti: bool) {
     println!("[INFO]: Drawing lines...");
 
     for pair in points.windows(2) { data.draw_line_with_thickness(pair[0], pair[1], TRI_COLOR, 2); }
-
+    
 
     println!("[INFO]: Saving to file...");
     let filename = format!("koch-n{:0>2}-anti{anti}.ppm", n);
