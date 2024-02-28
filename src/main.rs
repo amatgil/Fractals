@@ -69,7 +69,7 @@ fn save_flake(n: usize, anti: bool) {
 
 
     println!("[INFO]: Saving to file...");
-    let filename = format!("koch-n{:0>2}-anti{anti}.ppm", n);
+    let filename = format!("koch-n{:0>2}-anti{anti}.pbm", n);
     data.save_to_file(&filename).unwrap();
 
     println!("When n = {n}, there were {} points", points.len());
