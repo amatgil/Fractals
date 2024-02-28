@@ -8,7 +8,6 @@ const WIDTH: usize     = 2000;
 const HEIGHT: usize    = WIDTH;
 
 fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
-    // x
     let x = ((a.x as f64)*(1.0 - t) + (b.x as f64)*t).round() as usize;
     let y = ((a.y as f64)*(1.0 - t) + (b.y as f64)*t).round() as usize;
 
@@ -16,15 +15,16 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
 }
 
 fn save_flake(n: usize, anti: bool) {
+    println!("[INFO]: Initializing...");
     let mut data = ImagePPM::new(WIDTH, HEIGHT, BG);
-
     let mut points = vec![
         Coord { x: 1*WIDTH/4, y: 1*HEIGHT / 4 },
-        //Coord { x: 2*WIDTH/4, y: 3*HEIGHT / 4 },
+        Coord { x: 2*WIDTH/4, y: 3*HEIGHT / 4 },
         Coord { x: 3*WIDTH/4, y: 1*HEIGHT / 4 },
-        //Coord { x: 1*WIDTH/4, y: 1*HEIGHT / 4 }, // repetida pel cicle
+        Coord { x: 1*WIDTH/4, y: 1*HEIGHT / 4 }, // repetida pel cicle
     ];
 
+    println!("[INFO]: Starting computations...");
     for _ in 0..n {
         let mut new_points = vec![];
         
@@ -59,20 +59,30 @@ fn save_flake(n: usize, anti: bool) {
         }
         points = new_points
     }
+    println!("[INFO]: Drawing lines...");
 
     for pair in points.windows(2) { data.draw_line_with_thickness(pair[0], pair[1], TRI_COLOR, 2); }
 
-    let filename = format!("line.ppm");
-    data.save_to_file(&filename).unwrap();
-    println!("When n = {n}, there were {} points", points.len());
 
-    println!("Saved '{}'", filename);
+    println!("[INFO]: Saving to file...");
+    let filename = format!("koch-n{:0>2}-anti{anti}.ppm", n);
+    data.save_to_file(&filename).unwrap();
+
+    println!("When n = {n}, there were {} points", points.len());
+    println!("[INFO]: Saved '{}'", filename);
 }
 
 fn main() {
-    //for n in 0..15 {
-    for t in [false, true] {
-        save_flake(5, t);
-    }
-    //}
+    let args: Vec<_> = std::env::args().collect();
+    let n: usize = args.get(1).expect("You forgor n")
+        .parse().expect("n must be positive integer");
+
+    let anti: bool = {
+        let s = args.get(2).expect("You forgor to ask for anti or not (0 for normal, 1 for anti)");
+        if &*s == "0" { false }
+        else if &*s == "1" { true }
+        else { panic!("anti must be either 0 (normal) or 1 (anti) ")}
+    };
+
+    save_flake(n, anti);
 }
