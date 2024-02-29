@@ -2,8 +2,6 @@ use std::f64::consts::TAU;
 
 use ppmitzador::*;
 
-const WIDTH: usize     = 2000;
-const HEIGHT: usize    = WIDTH;
 const THETA: f64       = TAU/6.0;
 const GRID_SIDE: usize = 3;
 
@@ -22,7 +20,6 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
 
 fn draw_flake(img: &mut ImagePBM, n: usize, anti: bool, origin: Coord) {
     println!("[INFO]: Initializing...");
-    let mut data = ImagePBM::new(WIDTH, HEIGHT, false);
     let lowest_y  = (0.5 - (3.0 as f64).sqrt()/12.0)*(FLAKE_HEIGHT as f64);
     let highest_y = lowest_y + (3.0 as f64).sqrt()*(FLAKE_HEIGHT as f64)/4.0;
 
@@ -33,7 +30,7 @@ fn draw_flake(img: &mut ImagePBM, n: usize, anti: bool, origin: Coord) {
         Coord { x: 1*FLAKE_WIDTH/4 + origin.x, y: lowest_y  as usize + origin.y}, // repetida pel cicle
     ];
 
-    println!("[INFO]: Starting computations...");
+    println!("[INFO]: Starting computations for n = {n}...");
     for _ in 0..n {
         let mut new_points = vec![];
         
@@ -71,18 +68,12 @@ fn draw_flake(img: &mut ImagePBM, n: usize, anti: bool, origin: Coord) {
         }
         points = new_points
     }
-    println!("[INFO]: Drawing lines...");
+    println!("[INFO]: Drawing lines for n = {n}...");
 
     for pair in points.windows(2) {
         img.draw_line_with_thickness(pair[0], pair[1], true, 2); 
     }
 
-    println!("[INFO]: Saving to file...");
-    let filename = format!("koch-n{:0>2}-anti{anti}.pbm", n);
-    data.save_to_file(&filename).unwrap();
-
-    println!("When n = {n}, there were {} points", points.len());
-    println!("[INFO]: Saved '{}'", filename);
 }
 
 fn main() {
