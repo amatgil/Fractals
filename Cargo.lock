@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "ppmitzador"
 version = "0.1.0"
-source = "git+ssh://git@ilsrv.com:6722/Amat/ppmitzador.git#0e6d77d5fca4e1a08ca9b0777f1ec4cd1a25423f"
+source = "git+ssh://git@ilsrv.com:6722/Amat/ppmitzador.git#7e9e060df6330b993c8ec1db6996b265fc09a483"
 
 [[package]]
 name = "vonkoch_snowflake"

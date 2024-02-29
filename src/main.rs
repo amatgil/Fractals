@@ -5,6 +5,13 @@ use ppmitzador::*;
 const WIDTH: usize     = 2000;
 const HEIGHT: usize    = WIDTH;
 const THETA: f64       = TAU/6.0;
+const GRID_SIDE: usize = 3;
+
+const FLAKE_WIDTH: usize     = 1000;
+const FLAKE_HEIGHT: usize    = FLAKE_WIDTH;
+
+const WIDTH: usize     = FLAKE_WIDTH*GRID_SIDE;
+const HEIGHT: usize    = FLAKE_HEIGHT*GRID_SIDE;
 
 fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
     let x = ((a.x as f64)*(1.0 - t) + (b.x as f64)*t).round() as usize;
@@ -13,16 +20,17 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
     Coord { x, y }
 }
 
-fn save_flake(n: usize, anti: bool) {
+fn draw_flake(img: &mut ImagePBM, n: usize, anti: bool, origin: Coord) {
     println!("[INFO]: Initializing...");
     let mut data = ImagePBM::new(WIDTH, HEIGHT, false);
-    let lowest_y  = (0.5 - (3.0 as f64).sqrt()/12.0)*(HEIGHT as f64);
-    let highest_y = lowest_y + (3.0 as f64).sqrt()*(HEIGHT as f64)/4.0;
+    let lowest_y  = (0.5 - (3.0 as f64).sqrt()/12.0)*(FLAKE_HEIGHT as f64);
+    let highest_y = lowest_y + (3.0 as f64).sqrt()*(FLAKE_HEIGHT as f64)/4.0;
+
     let mut points = vec![
-        Coord { x: 1*WIDTH/4, y: lowest_y  as usize},
-        Coord { x: 2*WIDTH/4, y: highest_y as usize},
-        Coord { x: 3*WIDTH/4, y: lowest_y  as usize},
-        Coord { x: 1*WIDTH/4, y: lowest_y  as usize}, // repetida pel cicle
+        Coord { x: 1*FLAKE_WIDTH/4 + origin.x, y: lowest_y  as usize + origin.y},
+        Coord { x: 2*FLAKE_WIDTH/4 + origin.x, y: highest_y as usize + origin.y},
+        Coord { x: 3*FLAKE_WIDTH/4 + origin.x, y: lowest_y  as usize + origin.y},
+        Coord { x: 1*FLAKE_WIDTH/4 + origin.x, y: lowest_y  as usize + origin.y}, // repetida pel cicle
     ];
 
     println!("[INFO]: Starting computations...");
@@ -65,8 +73,9 @@ fn save_flake(n: usize, anti: bool) {
     }
     println!("[INFO]: Drawing lines...");
 
-    for pair in points.windows(2) { data.draw_line_with_thickness(pair[0], pair[1], true, 2); }
-
+    for pair in points.windows(2) {
+        img.draw_line_with_thickness(pair[0], pair[1], true, 2); 
+    }
 
     println!("[INFO]: Saving to file...");
     let filename = format!("koch-n{:0>2}-anti{anti}.pbm", n);
@@ -77,16 +86,16 @@ fn save_flake(n: usize, anti: bool) {
 }
 
 fn main() {
-    let args: Vec<_> = std::env::args().collect();
-    let n: usize = args.get(1).expect("You forgor n")
-        .parse().expect("n must be positive integer");
+    let mut data = ImagePBM::new(WIDTH, HEIGHT, false);
+    println!("w: {}, h: {}", WIDTH, HEIGHT);
+    
+    for y in 0..GRID_SIDE {
+        for x in 0..GRID_SIDE {
+            let origin = Coord { x: x * WIDTH / GRID_SIDE , y: y * HEIGHT / GRID_SIDE};
+            let n = 3*(GRID_SIDE - y - 1) + x;
+            draw_flake(&mut data, n, false, origin);
+        }
+    }
 
-    let anti: bool = {
-        let s = args.get(2).expect("You forgor to ask for anti or not (0 for normal, 1 for anti)");
-        if &*s == "0" { false }
-        else if &*s == "1" { true }
-        else { panic!("anti must be either 0 (normal) or 1 (anti) ")}
-    };
-
-    save_flake(n, anti);
+    data.save_to_file("atlas.pbm").unwrap();
 }
