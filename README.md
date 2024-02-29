@@ -5,7 +5,8 @@ This Rust program generates simple (Anti) Koch snowflakes from the commandline i
 
 Mutiple examples of the output are laid out in atlas/texturemap form in the [atlas.png](atlas.png) file.
 
-The program itself will generate a 3x3 atlas of the triangle from `n = 0` to `n = 8`.
+The program itself will generate a 3x3 atlas of the triangle from `n = 0` to `n = 8` (note
+that the thickness of the line decreases at `n = 8` to make the fine details noticeable).
 
 ## Table of Contents
 

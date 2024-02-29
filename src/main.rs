@@ -5,7 +5,7 @@ use ppmitzador::*;
 const THETA: f64       = TAU/6.0;
 const GRID_SIDE: usize = 3;
 
-const FLAKE_WIDTH: usize     = 1000;
+const FLAKE_WIDTH: usize     = 5000;
 const FLAKE_HEIGHT: usize    = FLAKE_WIDTH;
 
 const WIDTH: usize     = FLAKE_WIDTH*GRID_SIDE;
@@ -30,7 +30,7 @@ fn draw_flake(img: &mut ImagePBM, n: usize, anti: bool, origin: Coord) {
         Coord { x: 1*FLAKE_WIDTH/4 + origin.x, y: lowest_y  as usize + origin.y}, // repetida pel cicle
     ];
 
-    println!("[INFO]: Starting computations for n = {n}...");
+    println!("[INFO]: Computating for n = {n}...");
     for _ in 0..n {
         let mut new_points = vec![];
         
@@ -71,7 +71,10 @@ fn draw_flake(img: &mut ImagePBM, n: usize, anti: bool, origin: Coord) {
     println!("[INFO]: Drawing lines for n = {n}...");
 
     for pair in points.windows(2) {
-        img.draw_line_with_thickness(pair[0], pair[1], true, 2); 
+        let thickness = 
+            if n < 8 { 4 }
+            else { 1 };
+        img.draw_line_with_thickness(pair[0], pair[1], true, thickness); 
     }
 
 }
@@ -88,5 +91,7 @@ fn main() {
         }
     }
 
+    println!("[INFO]: Mathematics finished, saving file...");
     data.save_to_file("atlas.pbm").unwrap();
+    println!("[INFO]: File saved, enjoy! :D");
 }
