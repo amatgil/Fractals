@@ -16,7 +16,7 @@ Mutiple examples of the output are laid out in atlas/texturemap form in the [atl
 
 The [Koch Snowflake](https://en.wikipedia.org/wiki/Koch_snowflake) is a fractal named after Helge von Koch. It is formed by iteratively subdividing an equilateral triangle's sides into smaller equilateral triangles. This program provides a simple and customizable way to draw both verisons of it.
 
-The AntiSnowflake is obtained by rotating -τ/6 radians instead of τ/6 (easily visible in the code).
+The AntiSnowflake is obtained by scaling the vector that points to the tip of the spikes by -1.
 
 ## Usage
 
