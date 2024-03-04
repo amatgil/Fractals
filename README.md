@@ -6,7 +6,8 @@ This Rust program generates simple (Anti) Koch snowflakes from the commandline i
 Mutiple examples of the output are laid out in atlas/texturemap form in the [atlas.png](atlas.png) file.
 
 The program itself will generate a 3x3 atlas of the triangle from `n = 0` to `n = 8` (note
-that the thickness of the line decreases at `n = 8` to make the fine details noticeable).
+that the thickness of the line decreases at `n = 8` to make the fine details noticeable). Each tile 
+holds both the standard triangle as well as its anti form.
 
 ## Table of Contents
 
@@ -32,18 +33,14 @@ The AntiSnowflake is obtained by scaling the vector that points to the tip of th
 3. **Compile and run:**
 
 The program takes no arguments, just run it normally:
+
 ```bash
-cargo run --release
+cargo run --release && convert atlas.pbm atlas.png && gwenview atlas.png
 ```
 
 It is recommended that you use [this workaround in `.cargo/config.toml`](https://github.com/rust-lang/cargo/issues/2078) to authenticate in order to download the image drawing library (that I also wrote).
 
-This will save an appropriately named file with a `.pbm` extension. I suggest that you convert it to a png for reasonable storage and viewing reasons using `ImageMagick`:
-
-```bash
-covert your_file.pbm out.png
-```
-
+This will save an appropriately named file with a `.pbm` extension, conver it into a png using`ImageMagick` and open it with `gwenview` (both programs must be installed for the commands to work).
 
 ## License
 

@@ -5,10 +5,10 @@ use ppmitzador::*;
 const THETA: f64       = TAU/6.0;
 const GRID_SIDE: usize = 3;
 
-const FLAKE_WIDTH: usize     = 5000;
+const FLAKE_WIDTH: usize     = 4000;
 const FLAKE_HEIGHT: usize    = FLAKE_WIDTH;
 
-const WIDTH: usize     = FLAKE_WIDTH*GRID_SIDE;
+const WIDTH: usize     = FLAKE_WIDTH*GRID_SIDE*2;
 const HEIGHT: usize    = FLAKE_HEIGHT*GRID_SIDE;
 
 fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
@@ -85,13 +85,37 @@ fn main() {
     
     for y in 0..GRID_SIDE {
         for x in 0..GRID_SIDE {
-            let origin = Coord { x: x * WIDTH / GRID_SIDE , y: y * HEIGHT / GRID_SIDE};
-            let n = 3*(GRID_SIDE - y - 1) + x;
-            draw_flake(&mut data, n, false, origin);
+            for anti in [true, false] {
+                let mut origin = Coord { x: x * WIDTH / GRID_SIDE , y: y * HEIGHT / GRID_SIDE};
+                origin.x += (anti as usize)*FLAKE_WIDTH;
+                let n = 3*(GRID_SIDE - y - 1) + x;
+                draw_flake(&mut data, n, anti, origin);
+            }
         }
     }
 
-    println!("[INFO]: Mathematics finished, saving file...");
+    println!("[INFO]: Mathematics finished, adding finishing touches");
+    let mut y = 0;
+    while y < HEIGHT {
+        data.draw_line_with_thickness(
+            Coord::new(0, y),
+            Coord::new(WIDTH - 1, y),
+            true, 3);
+
+        y += FLAKE_HEIGHT;
+    }
+
+    let mut x = 0;
+    while x < WIDTH {
+        data.draw_line_with_thickness(
+            Coord::new(x, 0),
+            Coord::new(x, HEIGHT - 1),
+            true, 3);
+
+        x += FLAKE_WIDTH * 2;
+    }
+
+    println!("[INFO]: Drawing finished, saving file...");
     data.save_to_file("atlas.pbm").unwrap();
     println!("[INFO]: File saved, enjoy! :D");
 }
