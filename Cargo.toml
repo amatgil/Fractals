@@ -6,4 +6,4 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ppmitzador = { git = "ssh://git@ilsrv.com:6722/Amat/ppmitzador.git" }
+ppmitzador = { git = "https://github.com/amatgil/ppmitzador" }
