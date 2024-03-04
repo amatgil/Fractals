@@ -27,7 +27,7 @@ The AntiSnowflake is obtained by scaling the vector that points to the tip of th
 1. **Clone:**
 
 ```bash
-    git clone https://github.com/amatgil/KochSnowflake
+git clone https://github.com/amatgil/KochSnowflake
 ```
 
 3. **Compile and run:**
@@ -37,8 +37,6 @@ The program takes no arguments, just run it normally:
 ```bash
 cargo run --release && convert atlas.pbm atlas.png && gwenview atlas.png
 ```
-
-It is recommended that you use [this workaround in `.cargo/config.toml`](https://github.com/rust-lang/cargo/issues/2078) to authenticate in order to download the image drawing library (that I also wrote).
 
 This will save an appropriately named file with a `.pbm` extension, conver it into a png using`ImageMagick` and open it with `gwenview` (both programs must be installed for the commands to work).
 
