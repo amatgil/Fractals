@@ -27,7 +27,7 @@ The AntiSnowflake is obtained by scaling the vector that points to the tip of th
 1. **Clone:**
 
 ```bash
-    git clone ssh://git@ilsrv.com:6722/Amat/KochSnowflakeGenerator.git
+    git clone https://github.com/amatgil/KochSnowflake
 ```
 
 3. **Compile and run:**
