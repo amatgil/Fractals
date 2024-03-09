@@ -1,11 +1,13 @@
 use std::f64::consts::TAU;
 
-use ppmitzador::*;
+use ppmitzador::Coord;
+use std::io::BufWriter;
+use std::io::Write;
 
 const THETA: f64       = TAU/6.0;
 const GRID_SIDE: usize = 3;
 
-const FLAKE_WIDTH: usize     = 4000;
+const FLAKE_WIDTH: usize     = 1000;
 const FLAKE_HEIGHT: usize    = FLAKE_WIDTH;
 
 const WIDTH: usize     = FLAKE_WIDTH*GRID_SIDE*2;
@@ -18,16 +20,16 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
     Coord { x, y }
 }
 
-fn draw_flake(img: &mut ImagePBM, n: usize, anti: bool, origin: Coord) {
+fn get_flake_points(n: usize, anti: bool) -> Vec<Coord> {
     println!("[INFO]: Initializing...");
     let lowest_y  = (0.5 - (3.0 as f64).sqrt()/12.0)*(FLAKE_HEIGHT as f64);
     let highest_y = lowest_y + (3.0 as f64).sqrt()*(FLAKE_HEIGHT as f64)/4.0;
 
     let mut points = vec![
-        Coord { x: 1*FLAKE_WIDTH/4 + origin.x, y: lowest_y  as usize + origin.y},
-        Coord { x: 2*FLAKE_WIDTH/4 + origin.x, y: highest_y as usize + origin.y},
-        Coord { x: 3*FLAKE_WIDTH/4 + origin.x, y: lowest_y  as usize + origin.y},
-        Coord { x: 1*FLAKE_WIDTH/4 + origin.x, y: lowest_y  as usize + origin.y}, // repetida pel cicle
+        Coord { x: 1*FLAKE_WIDTH/4, y: lowest_y  as usize},
+        Coord { x: 2*FLAKE_WIDTH/4, y: highest_y as usize},
+        Coord { x: 3*FLAKE_WIDTH/4, y: lowest_y  as usize},
+        Coord { x: 1*FLAKE_WIDTH/4, y: lowest_y  as usize}, // repetida pel cicle
     ];
 
     println!("[INFO]: Computating for n = {n}...");
@@ -68,54 +70,25 @@ fn draw_flake(img: &mut ImagePBM, n: usize, anti: bool, origin: Coord) {
         }
         points = new_points
     }
-    println!("[INFO]: Drawing lines for n = {n}...");
 
-    for pair in points.windows(2) {
-        let thickness = 
-            if n < 8 { 4 }
-            else { 1 };
-        img.draw_line_with_thickness(pair[0], pair[1], true, thickness); 
-    }
+    println!("[INFO]: Returning points");
 
+    points
 }
 
 fn main() {
-    let mut data = ImagePBM::new(WIDTH, HEIGHT, false);
-    println!("w: {}, h: {}", WIDTH, HEIGHT);
-    
-    for y in 0..GRID_SIDE {
-        for x in 0..GRID_SIDE {
-            for anti in [true, false] {
-                let mut origin = Coord { x: x * WIDTH / GRID_SIDE , y: y * HEIGHT / GRID_SIDE};
-                origin.x += (anti as usize)*FLAKE_WIDTH;
-                let n = 3*(GRID_SIDE - y - 1) + x;
-                draw_flake(&mut data, n, anti, origin);
-            }
-        }
-    }
+    let n = 6;
+    let anti = false;
+    let file = std::fs::File::create("svg-test.svg").expect("Could not create file");
 
-    println!("[INFO]: Mathematics finished, adding finishing touches");
-    let mut y = 0;
-    while y < HEIGHT {
-        data.draw_line_with_thickness(
-            Coord::new(0, y),
-            Coord::new(WIDTH - 1, y),
-            true, 3);
+    let points = get_flake_points(n, anti);
 
-        y += FLAKE_HEIGHT;
-    }
+    let mut buffer = BufWriter::new(file); // This will likely get changed to stdio
+    buffer.write(format!("<svg viewBox=\"0 0 {WIDTH} {HEIGHT} \" xmlns=\"http://www.w3.org/2000/svg\" >\n").as_bytes()).unwrap();
+    buffer.write(format!("<polygon points=\"").as_bytes()).unwrap();
+    for Coord { x, y }  in points { buffer.write(format!("{x},{y} ").as_bytes()); }
+    buffer.write(format!("\" fill=\"none\" stroke=\"black\"/>\n").as_bytes()).unwrap();
+    buffer.write(format!("</svg>\n").as_bytes()).unwrap();
 
-    let mut x = 0;
-    while x < WIDTH {
-        data.draw_line_with_thickness(
-            Coord::new(x, 0),
-            Coord::new(x, HEIGHT - 1),
-            true, 3);
-
-        x += FLAKE_WIDTH * 2;
-    }
-
-    println!("[INFO]: Drawing finished, saving file...");
-    data.save_to_file("atlas.pbm").unwrap();
-    println!("[INFO]: File saved, enjoy! :D");
+    println!("[INFO]: Finished, file should have been written");
 }
