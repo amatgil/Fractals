@@ -5,13 +5,9 @@ use std::io::BufWriter;
 use std::io::Write;
 
 const THETA: f64       = TAU/6.0;
-const GRID_SIDE: usize = 3;
 
-const FLAKE_WIDTH: usize     = 1000;
-const FLAKE_HEIGHT: usize    = FLAKE_WIDTH;
-
-const WIDTH: usize     = FLAKE_WIDTH*GRID_SIDE*2;
-const HEIGHT: usize    = FLAKE_HEIGHT*GRID_SIDE;
+const WIDTH: usize     = 1000;
+const HEIGHT: usize    = 1000;
 
 fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
     let x = ((a.x as f64)*(1.0 - t) + (b.x as f64)*t).round() as usize;
@@ -21,15 +17,16 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
 }
 
 fn get_flake_points(n: usize, anti: bool) -> Vec<Coord> {
+    if n > 9 { panic!("n values above 8 make svg viewers struggle, so I'm disallowing them") }
     println!("[INFO]: Initializing...");
-    let lowest_y  = (0.5 - (3.0 as f64).sqrt()/12.0)*(FLAKE_HEIGHT as f64);
-    let highest_y = lowest_y + (3.0 as f64).sqrt()*(FLAKE_HEIGHT as f64)/4.0;
+    let lowest_y  = (0.5 - (3.0 as f64).sqrt()/12.0)*(HEIGHT as f64);
+    let highest_y = lowest_y + (3.0 as f64).sqrt()*(HEIGHT as f64)/4.0;
 
     let mut points = vec![
-        Coord { x: 1*FLAKE_WIDTH/4, y: lowest_y  as usize},
-        Coord { x: 2*FLAKE_WIDTH/4, y: highest_y as usize},
-        Coord { x: 3*FLAKE_WIDTH/4, y: lowest_y  as usize},
-        Coord { x: 1*FLAKE_WIDTH/4, y: lowest_y  as usize}, // repetida pel cicle
+        Coord { x: 1*WIDTH/4, y: lowest_y  as usize},
+        Coord { x: 2*WIDTH/4, y: highest_y as usize},
+        Coord { x: 3*WIDTH/4, y: lowest_y  as usize},
+        Coord { x: 1*WIDTH/4, y: lowest_y  as usize}, // repetida pel cicle
     ];
 
     println!("[INFO]: Computating for n = {n}...");
@@ -77,7 +74,7 @@ fn get_flake_points(n: usize, anti: bool) -> Vec<Coord> {
 }
 
 fn main() {
-    let n = 6;
+    let n = 9;
     let anti = false;
     let file = std::fs::File::create("svg-test.svg").expect("Could not create file");
 
