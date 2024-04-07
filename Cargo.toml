@@ -1,9 +1,20 @@
 [package]
-name = "vonkoch_snowflake"
+name = "fractals"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+console_error_panic_hook = "0.1.7"
 ppmitzador = { git = "https://github.com/amatgil/ppmitzador" }
+wasm-bindgen = "0.2.92"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+opt-level = "z"  # Optimize for size.
+lto = true
+codegen-units = 1 # Smaller code at the cost of compile times
