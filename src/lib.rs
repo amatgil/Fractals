@@ -1,20 +1,23 @@
 use std::f64::consts::TAU;
 
 use ppmitzador::Coord;
-use std::io::BufWriter;
-use std::io::Write;
 
 use wasm_bindgen::prelude::*;
 
+
+const WIDTH: usize  = 1024;
+const HEIGHT: usize = WIDTH;
+const COLOR: &str = "#f0c6c6";
+
+// Von Koch constants
 const THETA: f64 = TAU/6.0;
 
-const WIDTH: usize  = 1000;
-const HEIGHT: usize = WIDTH;
-
+// Wasm "constants"
 pub fn set_panic_hook() {
     console_error_panic_hook::set_once();
 }
 
+// Misc
 fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
     let x = ((a.x as f64)*(1.0 - t) + (b.x as f64)*t).round() as usize;
     let y = ((a.y as f64)*(1.0 - t) + (b.y as f64)*t).round() as usize;
@@ -22,6 +25,8 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
     Coord { x, y }
 }
 
+
+// Von Koch Functions
 fn get_flake_points(n: usize, anti: bool) -> Vec<Coord> {
     if n > 9 { panic!("n values above 8 make svg viewers struggle, so I'm disallowing them") }
     println!("[INFO]: Initializing...");
@@ -90,56 +95,61 @@ pub fn vonkoch(n: usize, anti: bool) -> String {
     for Coord { x, y } in points {
 	buffer.push_str(&format!("{x},{y} "));
     }
-    buffer.push_str(&format!("\" fill=\"none\" stroke=\"#f0c6c6\"/>\n"));
+    buffer.push_str(&format!("\" fill=\"none\" stroke=\"{COLOR}\"/>\n"));
     buffer.push_str(&format!("</svg>\n"));
-
-    println!("[INFO]: Finished, file should have been written");
 
     return buffer;
 }
 
+// Sierp functions
 #[wasm_bindgen]
 pub fn sierp(n: usize) -> String {
     let lowest_y  = (0.5 - (3.0 as f64).sqrt()/12.0)*(HEIGHT as f64);
     let highest_y = lowest_y + (3.0 as f64).sqrt()*(HEIGHT as f64)/4.0;
+    let lowest_y = lowest_y as usize;
+    let highest_y = highest_y as usize;
 
-    let mut filled_triangles: Vec<[Coord; 3]> =
-	vec![
-	    [
-		Coord { x: 1*WIDTH/4, y: lowest_y  as usize},
-		Coord { x: 2*WIDTH/4, y: highest_y as usize},
-		Coord { x: 3*WIDTH/4, y: lowest_y  as usize},
-	    ]
-	];
 
-    for _ in 0..n {
-	let mut new_filled_triangles: Vec<[Coord; 3]> = Vec::new();
-	let mut new_points: Vec<Coord> = Vec::new();
 
-        for c in filled_triangles.concat() {
-	    let closest_left: Coord = todo!();
-	    let closest_right: Coord = todo!();
+    let base_side_length = Coord { x: WIDTH/4 , y: highest_y - lowest_y };
 
-	    let new_left = {
-		let x = (c.x + closest_left.x) / 2;
-		let y = (c.y + closest_left.y) / 2;
-		Coord { x, y }
-	    };
+    let mut points = Vec::new();
+    sierp_go(n, &mut points, Coord { x: WIDTH/4, y: lowest_y as usize}, base_side_length);
+    points = points.into_iter().map(|triplet| triplet.map(|p| Coord { x: p.x, y: HEIGHT - p.y - 1 })).collect(); // Flip vertically
 
-	    let new_right = {
-		let x = (c.x + closest_right.x) / 2;
-		let y = (c.y + closest_right.y) / 2;
-		Coord { x, y }
-	    };
-	    let new_bottom = {
-		let x = (closest_left.x + closest_right.x) / 2;
-		let y = (closest_left.y + closest_right.y) / 2;
-		Coord { x, y }
-	    };
-	    new_filled_triangles.push([c, new_left, new_right]);
-	    new_filled_triangles.push([closest_left, new_left, new_bottom]);
-	    new_filled_triangles.push([closest_right, new_right, new_bottom]);
-	}
+    let mut buffer = String::new();
+
+    buffer.push_str(&format!("<svg viewBox=\"0 0 {WIDTH} {HEIGHT} \" xmlns=\"http://www.w3.org/2000/svg\" id=\"sierp-holder\">\n"));
+    for triplet in points {
+	buffer.push_str(&format!("<polygon points=\""));
+	for Coord { x, y } in triplet {buffer.push_str(&format!("{x},{y} "));}
+	buffer.push_str(&format!("\" fill=\"{COLOR}\" stroke=\"#000000\" stroke-width=\"0.1%\"/>\n"));
     }
-    todo!()
+    buffer.push_str(&format!("</svg>\n"));
+
+    return buffer;
+}
+
+pub fn sierp_go(n: usize, points: &mut Vec<[Coord; 3]>, start_pos: Coord, side_length: Coord) {
+    // Triambgle:
+    //     c
+    //    / \
+    //   /   \
+    //  /     \
+    // a ----- b     a = start_pos
+
+    let c = start_pos + side_length;
+    let b = start_pos + Coord { x: side_length.x*2, y: 0 };
+
+    if n <= 0 {
+	points.push([start_pos, c, b]);
+    } else {
+	let half_side_length = Coord { x: side_length.x / 2, y: side_length.y / 2 };
+
+	let c = start_pos + half_side_length;
+	let b = start_pos + Coord { x: half_side_length.x*2, y: 0 };
+	sierp_go(n - 1, points, start_pos, half_side_length);
+	sierp_go(n - 1, points, c, half_side_length);
+	sierp_go(n - 1, points, b, half_side_length);
+    }
 }
