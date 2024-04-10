@@ -153,3 +153,53 @@ pub fn sierp_go(n: usize, points: &mut Vec<[Coord; 3]>, start_pos: Coord, side_l
 	sierp_go(n - 1, points, b, half_side_length);
     }
 }
+
+// Tree functions
+
+#[derive(Debug, Clone)]
+struct Line {
+    a: Coord,
+    b: Coord
+}
+
+
+#[wasm_bindgen]
+pub fn tree(n: usize, theta: f64, branch_length: usize) -> String {
+    let mut lines = Vec::new();
+    let first  = Coord { x: WIDTH / 2, y: 2*HEIGHT / 3};
+    let second = Coord { x: first.x, y: first.y - branch_length};
+    lines.push(Line {a: first, b: second});
+
+    tree_go(n, &mut lines, theta, branch_length, second);
+    //lines = lines.into_iter().map(|line| Line {
+    //	a: Coord { x: line.a.x, y: HEIGHT - line.a.y - 1 },
+    //	b: Coord { x: line.b.x, y: HEIGHT - line.b.y - 1 },
+    //}).collect(); // Flip vertically
+
+    let mut buffer = String::new();
+
+    buffer.push_str(&format!("<svg viewBox=\"0 0 {WIDTH} {HEIGHT} \" xmlns=\"http://www.w3.org/2000/svg\" id=\"tree-holder\">\n"));
+    for line in lines {
+	buffer.push_str(&format!("<line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" stroke=\"{COLOR}\" stroke-width=\"5\"/>", line.a.x, line.a.y, line.b.x, line.b.y));
+    }
+    buffer.push_str(&format!("</svg>\n"));
+
+    return buffer;
+}
+
+fn tree_go(n: usize, mut v: &mut Vec<Line>, theta: f64, branch_length: usize, r: Coord) {
+    if n <= 0 { return; }
+
+    let dx = (branch_length as f64 * theta.cos()).round() as usize;
+    let dy = (branch_length as f64 * theta.sin()).round() as usize;
+    let dtheta = 0.2;
+
+    let a = Coord { x: r.x - dx, y: r.y - dy };
+
+    let b = Coord { x: r.x + dx, y: r.y - dy };
+    v.push( Line {a: r.clone(), b: a});
+    v.push( Line {a: r, b});
+
+    tree_go(n - 1, v, theta - dtheta, branch_length, a);
+    tree_go(n - 1, v, theta - dtheta, branch_length, b);
+}
