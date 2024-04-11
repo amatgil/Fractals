@@ -210,7 +210,7 @@ struct Line {
 }
 
 #[wasm_bindgen]
-pub fn tree(n: usize, theta: f64, branch_length: usize) -> String {
+pub fn tree(n: i32, theta: f64, branch_length: usize, branch_multiplier: f64) -> String {
     let mut lines = Vec::new();
     let first = Coord {
         x: WIDTH / 2,
@@ -227,7 +227,7 @@ pub fn tree(n: usize, theta: f64, branch_length: usize) -> String {
     let first_line = Line { a: first, b: second };
     lines.push(first_line);
 
-    tree_go(n, &mut lines, theta, branch_length, first_line);
+    if (n > 0) { tree_go(n as usize, &mut lines, theta, branch_multiplier, first_line); }
 
     let mut buffer = String::new();
 
@@ -241,6 +241,27 @@ pub fn tree(n: usize, theta: f64, branch_length: usize) -> String {
     buffer.push_str(&format!("</svg>\n"));
 
     return buffer;
+}
+
+fn tree_go(n: usize, mut v: &mut Vec<Line>, theta: f64, branch_multiplier: f64, r: Line) {
+    if n <= 0 { return; }
+
+    let t = get_angle(&r);
+    let e = Coord {
+	x: (r.b.x as f64 + (r.b.x as f64 * branch_multiplier) - (r.a.x as f64 * branch_multiplier)).round() as usize,
+	y: (r.b.y as f64 + (r.b.y as f64 * branch_multiplier) - (r.a.y as f64 * branch_multiplier)).round() as usize,
+    };;
+
+    let p1 = rotate_point_around_pivot(e, r.b, -theta);
+    let p2 = rotate_point_around_pivot(e, r.b, theta);
+
+    let l1 = Line { a: r.b.clone(), b: p1 };
+    let l2 = Line { a: r.b, b: p2 };
+    v.push(l1.clone());
+    v.push(l2.clone());
+
+    tree_go(n - 1, v, theta, branch_multiplier, l1);
+    tree_go(n - 1, v, theta, branch_multiplier, l2);
 }
 
 // Taken inspiration from SO
@@ -258,22 +279,4 @@ fn get_angle(l: &Line) -> f64 {
     let x = (l.b.x - l.a.x) as f64;
     let y = (l.b.y - l.a.y) as f64;
     return (x/y).atan();
-}
-
-fn tree_go(n: usize, mut v: &mut Vec<Line>, theta: f64, branch_length: usize, r: Line) {
-    if n <= 0 { return; }
-
-    let t = get_angle(&r);
-    let e = r.b + r.b - r.a;
-
-    let p1 = rotate_point_around_pivot(e, r.b, -theta);
-    let p2 = rotate_point_around_pivot(e, r.b, theta);
-
-    let l1 = Line { a: r.b.clone(), b: p1 };
-    let l2 = Line { a: r.b, b: p2 };
-    v.push(l1.clone());
-    v.push(l2.clone());
-
-    tree_go(n - 1, v, theta, branch_length, l1);
-    tree_go(n - 1, v, theta, branch_length, l2);
 }
