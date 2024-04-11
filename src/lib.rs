@@ -203,7 +203,7 @@ pub fn sierp_go(n: usize, points: &mut Vec<[Coord; 3]>, start_pos: Coord, side_l
 
 // Tree functions
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 struct Line {
     a: Coord,
     b: Coord,
@@ -214,7 +214,7 @@ pub fn tree(n: usize, theta: f64, branch_length: usize) -> String {
     let mut lines = Vec::new();
     let first = Coord {
         x: WIDTH / 2,
-        y: 2 * HEIGHT / 3,
+        y: HEIGHT * 80 / 100,
     };
     let second = Coord {
         x: first.x,
@@ -224,8 +224,10 @@ pub fn tree(n: usize, theta: f64, branch_length: usize) -> String {
         a: first,
         b: second,
     });
+    let first_line = Line { a: first, b: second };
+    lines.push(first_line);
 
-    tree_go(n, &mut lines, theta, branch_length, second);
+    tree_go(n, &mut lines, theta, branch_length, first_line);
 
     let mut buffer = String::new();
 
@@ -241,28 +243,37 @@ pub fn tree(n: usize, theta: f64, branch_length: usize) -> String {
     return buffer;
 }
 
-fn tree_go(n: usize, mut v: &mut Vec<Line>, theta: f64, branch_length: usize, r: Coord) {
-    if n <= 0 {
-        return;
+// Taken inspiration from SO
+fn rotate_point_around_pivot(mut p: Coord, pivot: Coord, theta: f64) -> Coord {
+    let s = theta.sin();
+    let c = theta.cos();
+
+    Coord {
+	x: (c * (p.x as isize - pivot.x as isize) as f64 - s * (p.y as isize - pivot.y as isize) as f64 + pivot.x as f64).round() as usize,
+	y: (s * (p.x as isize - pivot.x as isize) as f64 + c * (p.y as isize - pivot.y as isize) as f64 + pivot.y as f64).round() as usize,
     }
+}
 
-    let dx = (branch_length as f64 * theta.cos()).round() as usize;
-    let dy = (branch_length as f64 * theta.sin()).round() as usize;
-    let dtheta = 0.5;
+fn get_angle(l: &Line) -> f64 {
+    let x = (l.b.x - l.a.x) as f64;
+    let y = (l.b.y - l.a.y) as f64;
+    return (x/y).atan();
+}
 
-    let a = Coord {
-        x: r.x - dx,
-        y: r.y - dy,
-    };
-    let b = Coord {
-        x: r.x + dx,
-        y: r.y - dy,
-    };
+fn tree_go(n: usize, mut v: &mut Vec<Line>, theta: f64, branch_length: usize, r: Line) {
+    if n <= 0 { return; }
 
-    v.push(Line { a: r.clone(), b: a });
-    v.push(Line { a: r, b });
+    let t = get_angle(&r);
+    let e = r.b + r.b - r.a;
 
-    for x in [a, b] {
-        tree_go(n - 1, v, theta - dtheta, branch_length, x)
-    }
+    let p1 = rotate_point_around_pivot(e, r.b, -theta);
+    let p2 = rotate_point_around_pivot(e, r.b, theta);
+
+    let l1 = Line { a: r.b.clone(), b: p1 };
+    let l2 = Line { a: r.b, b: p2 };
+    v.push(l1.clone());
+    v.push(l2.clone());
+
+    tree_go(n - 1, v, theta, branch_length, l1);
+    tree_go(n - 1, v, theta, branch_length, l2);
 }
