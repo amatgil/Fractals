@@ -1,0 +1,46 @@
+#+TITLE: Svg Fractal Generator
+#+AUTHOR: Amat Gil
+#+OPTIONS: toc:1
+
+This Rust library offers functions that, given the iteration count and extra fractal-dependent variables, return a `String` containing the raw svg content. It mainly targets `wasm`
+for reasonably (for some definition of reasonable) easy use in my [site](https://amatgil.cat).
+
+Fractals included so far include:
+- Sierpinski's triangle
+- Vonkoch's snowflake
+- Basic Tree
+- Pythegoras' tree
+
+With more to come!
+
+* Basic definitions
+
+The rule only gets executed if `n` is non-zero. When called recursively, it is implicitly decremented.
+
+| Fractal      | Axiom             | Rules                                                                                                                                                                           |
+|--------------+-------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Sierpinski's | One point         | Move the appropriate side-length length 60º and 0º and draw yourself. If n == 0, become a triangle                                                                              |
+| Vonkoch's    | Three points      | For each adjacent pair of points, find three more such that a new inline equilateral triangle exists                                                                            |
+| Basic Tree   | A vertical line   | Draw two branches angled theta and -theta in relation to their root                                                                                                             |
+| Pythagoras'  | A horizontal line | Draw a square whose base is the line. Draw a triangle on top such that one of the angles is theta and the opposite one is 90º. Repeat using the other triangle's edges as roots |
+
+
+* Usage
+
+Clone it, obviously
+
+#+BEGIN_SRC sh
+git clone https://github.com/amatgil/KochSnowflake
+#+END_SRC
+
+Compile the wasm:
+
+#+BEGIN_SRC sh
+just web # Requires just to be installed (cargo install just)
+#+END_SRC
+
+The `justfile` contains some other convenience functions, not strictly necessary
+
+* License
+
+This project and all files contained therein and licensed under the [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.txt) license (see [COPYING](COPYING) file).
