@@ -4,6 +4,8 @@ use crate::*;
 const WIDTH: usize = 1500;
 const HEIGHT: usize = WIDTH;
 
+const TRI_COLOR: &str = "none";
+const QUA_COLOR: &str = COLOR;
 
 
 // Places in bounds
@@ -48,7 +50,8 @@ pub fn pythagorean_tree(n: i32, theta: f64, side_length: usize) -> String {
     for shape in shapes {
         buffer.push_str(&format!("<polygon points=\""));
         for Coord { x, y } in shape.points().into_iter().map(normalize) { buffer.push_str(&format!("{x},{} ", mirror_y_properly(y))); }
-        buffer.push_str(&format!("\" fill=\"none\" stroke-width=\"5px\" stroke=\"{COLOR}\"/>\n"));
+        let col = if shape.points().len() == 3 { TRI_COLOR } else { QUA_COLOR };
+        buffer.push_str(&format!("\" fill=\"{col}\" stroke-width=\"5px\" stroke=\"{col}\"/>\n"));
     }
 
     buffer.push_str(&format!("<line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" stroke-width=\"10px\" stroke=\"#000000\" />",
