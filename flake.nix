@@ -9,25 +9,7 @@
   outputs = { nixpkgs, rust-overlay, ... }:
     let system = "x86_64-linux";
     in {
-      devShell.${system} = let
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [ rust-overlay.overlay ];
-        };
-      in (({ pkgs, ... }:
-        pkgs.mkShell {
-          buildInputs = with pkgs; [
-            cargo
-            cargo-watch
-            nodejs
-            wasm-pack
-            (rust-bin.stable.latest.default.override {
-              extensions = [ "rust-src" ];
-              targets = [ "wasm32-unknown-unknown" ];
-            })
-          ];
-
-          shellHook = "";
-        }) { pkgs = pkgs; });
+      packages.default = nixpkgs.callPackage ./default.nix { pkgs = nixpkgs; };
+      devShell.${system}.default = nixpkgs.callPackage ./shell.nix { pkgs = nixpkgs; };
     };
 }
