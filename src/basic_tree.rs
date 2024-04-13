@@ -34,10 +34,9 @@ pub fn tree(n: i32, theta: f64, branch_length: usize, branch_multiplier: f64) ->
     return buffer;
 }
 
-fn tree_go(n: usize, mut v: &mut Vec<Line>, theta: f64, branch_multiplier: f64, r: Line) {
+fn tree_go(n: usize, v: &mut Vec<Line>, theta: f64, branch_multiplier: f64, r: Line) {
     if n <= 0 { return; }
 
-    let t = get_angle(&r);
     let e = Coord { // r.b + (r.b - r.a)*bmult
 	    x: (r.b.x as f64 + (r.b.x as f64 * branch_multiplier) - (r.a.x as f64 * branch_multiplier)).round() as usize,
 	    y: (r.b.y as f64 + (r.b.y as f64 * branch_multiplier) - (r.a.y as f64 * branch_multiplier)).round() as usize,

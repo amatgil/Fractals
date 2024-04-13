@@ -85,7 +85,6 @@ fn pythagorean_tree_go(n: usize, shapes: &mut Shapes, theta: f64, base_line: Lin
         //   /    \
         //  /      \
         // a ------- b
-        let l = base_line.b.distance(base_line.a).round() as usize;
         let a = q.d;
         let b = q.c;
         let c = {

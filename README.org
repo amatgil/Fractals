@@ -19,7 +19,7 @@ The rule only gets executed if `n` is non-zero. When called recursively, it is i
 
 | Fractal      | Axiom             | Rules                                                                                                                                                                           |
 |--------------+-------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Sierpinski's | One point         | Move the appropriate side-length length 60º and 0º and draw yourself. If n == 0, become a triangle                                                                              |
+| Sierpinski's | One point         | Move the appropriate side-length length 60º and 0º and draw yourself. If =n == 0=, become a triangle                                                                            |
 | Vonkoch's    | Three points      | For each adjacent pair of points, find three more such that a new inline equilateral triangle exists                                                                            |
 | Basic Tree   | A vertical line   | Draw two branches angled theta and -theta in relation to their root                                                                                                             |
 | Pythagoras'  | A horizontal line | Draw a square whose base is the line. Draw a triangle on top such that one of the angles is theta and the opposite one is 90º. Repeat using the other triangle's edges as roots |
@@ -39,7 +39,7 @@ Compile the wasm:
 just web # Requires just to be installed (cargo install just)
 #+END_SRC
 
-The `justfile` contains some other convenience functions, not strictly necessary
+The =justfile= contains some other convenience functions, not strictly necessary
 
 * License
 

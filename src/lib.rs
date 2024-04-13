@@ -12,6 +12,7 @@ mod fancy_tree;
 mod basic_tree;
 mod sierp;
 mod snowflake;
+mod system_l;
 
 // Wasm "constants"
 pub fn set_panic_hook() {
@@ -27,7 +28,7 @@ fn lerp_c(a: Coord, b: Coord, t: f64) -> Coord {
 
 
 // Taken inspiration from SO
-fn rotate_point_around_pivot(mut p: Coord, pivot: Coord, theta: f64) -> Coord {
+fn rotate_point_around_pivot(p: Coord, pivot: Coord, theta: f64) -> Coord {
     let s = theta.sin();
     let c = theta.cos();
 
