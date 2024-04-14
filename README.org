@@ -2,14 +2,14 @@
 #+AUTHOR: Amat Gil
 #+OPTIONS: toc:1
 
-This Rust library offers functions that, given the iteration count and extra fractal-dependent variables, return a `String` containing the raw svg content. It mainly targets `wasm`
-for reasonably (for some definition of reasonable) easy use in my [site](https://amatgil.cat).
-
+This Rust library offers functions that, given the iteration count and extra fractal-dependent variables, return a =String= containing the raw svg content. It mainly targets =wasm=
+for reasonably (for some definition of reasonable) easy use in my [[https://amatgil.cat][site]].
 Fractals included so far include:
 - Sierpinski's triangle
 - Vonkoch's snowflake
 - Basic Tree
 - Pythegoras' tree
+- All of System L's ones that may be drawn by drawing/advancing/rotating only (for now)
 
 With more to come!
 
@@ -24,6 +24,7 @@ The rule only gets executed if `n` is non-zero. When called recursively, it is i
 | Basic Tree   | A vertical line   | Draw two branches angled theta and -theta in relation to their root                                                                                                             |
 | Pythagoras'  | A horizontal line | Draw a square whose base is the line. Draw a triangle on top such that one of the angles is theta and the opposite one is 90º. Repeat using the other triangle's edges as roots |
 
+There's also =System L=, which is a fractal generator. The site includes examples, and so does the [[https://en.wikipedia.org/wiki/L-system][Wikipedia Page]].
 
 * Usage
 
@@ -39,7 +40,7 @@ Compile the wasm:
 just web # Requires just to be installed (cargo install just)
 #+END_SRC
 
-The =justfile= contains some other convenience functions, not strictly necessary
+The =justfile= contains some other convenience functions, not strictly necessary. The commands inside of it can be executed manually
 
 * License
 
