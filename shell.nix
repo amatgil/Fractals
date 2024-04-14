@@ -7,26 +7,20 @@ let
     rust-analyzer
     rustfmt
     clippy
-
     clang
     mold
 
-    nixfmt-rfc-style
-
-    pkg-config
-    libGLU
-    libGL
-    libxkbcommon
-
     (rust-bin.stable.latest.default.override {
-      extensions = [ "rust-src" ];
-      targets = [ "wasm32-unknown-unknown" ];
-    })
+     extensions = [ "rust-src" ];
+     targets = [ "wasm32-unknown-unknown" ];
+     })
+    wasm-pack
+    wasm-bindgen-cli
   ];
 in
 pkgs.mkShell {
   # Get dependencies from the main package
-  inputsFrom = [ (pkgs.callPackage ./default.nix { }) ];
+  #inputsFrom = [ (pkgs.callPackage ./default.nix { }) ];
   nativeBuildInputs = packages;
   buildInputs = packages;
   env = {

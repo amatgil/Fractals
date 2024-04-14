@@ -1,15 +1,27 @@
 {
-  description = "Von Koch snowflake generator for amatgil.cat";
-
+  description = "Basic Rust development flake (per a mi)";
   inputs = {
-    nixpkgs = { url = "github:nixos/nixpkgs/nixos-unstable"; };
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     rust-overlay = { url = "github:oxalica/rust-overlay"; };
   };
-
-  outputs = { nixpkgs, rust-overlay, ... }:
-    let system = "x86_64-linux";
-    in {
-      packages.default = nixpkgs.callPackage ./default.nix { pkgs = nixpkgs; };
-      devShell.${system}.default = nixpkgs.callPackage ./shell.nix { pkgs = nixpkgs; };
+  outputs = { self, nixpkgs, rust-overlay }:
+    let
+      supportedSystems = [ "x86_64-linux" ];
+      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+      pkgsFor = system: (import nixpkgs { inherit system; });
+    in
+    {
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ rust-overlay.overlay];
+          };
+        in
+        {
+          default = pkgs.callPackage ./shell.nix { inherit pkgs; };
+        }
+      );
     };
 }

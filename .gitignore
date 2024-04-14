@@ -2,3 +2,5 @@
 *.ppm
 *.pbm
 *.png
+.env
+.direnv
