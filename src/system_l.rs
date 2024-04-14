@@ -2,11 +2,14 @@ use std::collections::HashMap;
 
 use crate::*;
 
+const WIDTH: usize = 2000;
+const HEIGHT: usize = WIDTH;
+
 #[derive(serde::Serialize, serde::Deserialize)]
 pub enum LSystemTurtle {
     DoNothing,
     DrawForward(f64),
-    Rotate(f64),  // Rotate in radians
+    Rotate(f64),  // Rotate in degrees
     Advance(f64), // Multiplier of side length
 }
 
@@ -15,12 +18,54 @@ pub struct RulesMap {
     val: HashMap<String, String>
 }
 
-
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TurtleMapping {
     val: HashMap<char, LSystemTurtle>
 }
 
+#[wasm_bindgen]
+pub fn get_empty_rules_map() -> JsValue {
+    set_panic_hook();
+    let r = RulesMap { val: HashMap::new() };
+    serde_wasm_bindgen::to_value(&r).unwrap()
+}
+
+#[wasm_bindgen]
+pub fn get_empty_turtle_map() -> JsValue {
+    set_panic_hook();
+    let r = TurtleMapping { val: HashMap::new() };
+    serde_wasm_bindgen::to_value(&r).unwrap()
+}
+
+#[wasm_bindgen]
+pub fn add_to_turtle_map(turtle_mapping: JsValue, c: char, s: String, amount: f64) -> Result<JsValue, String> {
+    set_panic_hook();
+    let TurtleMapping { val: mut turtle_map } = serde_wasm_bindgen::from_value(turtle_mapping).unwrap();
+
+    let v: LSystemTurtle = match &*s {
+	"rotate" => LSystemTurtle::Rotate(amount),
+	"advance" => LSystemTurtle::Advance(amount),
+	"draw" => LSystemTurtle::DrawForward(amount),
+	_ => return Err(format!("{s} is not a valid enum variant")),
+    };
+    turtle_map.insert(c, v);
+
+    let new_turtle_mapping = TurtleMapping{ val: turtle_map };
+
+    let new_map: JsValue = serde_wasm_bindgen::to_value(&new_turtle_mapping).expect("What the fuck? How did this crash?");
+    Ok(new_map)
+}
+
+#[wasm_bindgen]
+pub fn add_to_rules_map(rules_mapping: JsValue, lhs: String, rhs: String) -> Result<JsValue, String> {
+    set_panic_hook();
+    let RulesMap { val: mut rules_map } = serde_wasm_bindgen::from_value(rules_mapping).unwrap();
+    rules_map.insert(lhs, rhs);
+    let new_rules_mapping = RulesMap { val: rules_map };
+
+    let new_map: JsValue = serde_wasm_bindgen::to_value(&new_rules_mapping).expect("What the fuck? How did this crash?");
+    Ok(new_map)
+}
   
 #[wasm_bindgen]
 pub fn generate_l_fractal(
@@ -33,6 +78,7 @@ pub fn generate_l_fractal(
     start_direction: f64,
     line_length: i32
 ) -> Result<String, String> {
+    set_panic_hook();
     let error_svg = |e: &str| {
         format!("<svg viewBox=\"0 0 {WIDTH} {HEIGHT} \" xmlns=\"http://www.w3.org/2000/svg\" id=\"l-system-holder\">\n <text x=\"20\" y=\"20\">{e}'</text></svg>\n")
     };
@@ -80,27 +126,28 @@ pub fn get_system_l_lines(
     for c in state.chars() {
 	if let Some(turtl) = turtle.get(&c) {
 	    match turtl {
-		LSystemTurtle::DoNothing => { },
 		LSystemTurtle::DrawForward(lambda) => {
 		    let end = Coord {
-			x: pos.x + (line_length as f64 * lambda * direction.cos()).round() as usize,
-			y: pos.y + (line_length as f64 * lambda * direction.sin()).round() as usize,
+			x: (pos.x as f64 + line_length as f64 * lambda * direction.cos()).round() as usize,
+			y: (pos.y as f64 + line_length as f64 * lambda * direction.sin()).round() as usize,
 		    };
 		    lines.push(Line { a: pos, b: end });
 		    pos = end;
 		},
-		LSystemTurtle::Rotate(theta) => direction += theta,
+		LSystemTurtle::Rotate(theta) => direction += theta * TAU / 360.0,
 		LSystemTurtle::Advance(lambda) => { // Same code as draw forwards but without pushing the line
 		    let end = Coord {
-			x: pos.x + (line_length as f64 * lambda * direction.cos()).round() as usize,
-			y: pos.y + (line_length as f64 * lambda * direction.sin()).round() as usize,
+			x: (pos.x as f64 + line_length as f64 * lambda * direction.cos()).round() as usize,
+			y: (pos.y as f64 + line_length as f64 * lambda * direction.sin()).round() as usize,
 		    };
 		    lines.push(Line { a: pos, b: end });
 		    pos = end;
 		}
+		LSystemTurtle::DoNothing => { },
 	    }
 	} else {
-	    return Err(format!("Variable/constant {c} has no assigned turtle action"));
+	    //return Err(format!("Variable/constant {c} has no assigned turtle action"));
+	     { } // If it has nothing, we assume they meant to do nothing
 	}
     }
 
