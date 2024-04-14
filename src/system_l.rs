@@ -94,6 +94,11 @@ pub fn generate_l_fractal(
     let lines: Vec<Line> = get_system_l_lines(n, &axiom, &rules, &turtle_map, start_pos, start_direction, line_length)
 	.map_err(|e| error_svg(&e))?;
 
+    // Flip across x-axis, safely
+    let lines: Vec<Line> = lines.into_iter()
+        .map(| Line { a: Coord { x: ax, y: ay }, b: Coord { x: bx, y: by} } | Line { a: Coord { x: ax, y: HEIGHT - ay.min(HEIGHT - 1) - 1}, b: Coord { x: bx, y: HEIGHT - by.min(HEIGHT - 1) - 1 } })
+        .collect();
+
     let mut buffer = String::new();
 
     buffer.push_str(&format!("<svg viewBox=\"0 0 {WIDTH} {HEIGHT} \" xmlns=\"http://www.w3.org/2000/svg\" id=\"l-system-holder\">\n"));
@@ -116,41 +121,51 @@ pub fn get_system_l_lines(
     start_direction: f64,
     line_length: i32
 ) -> Result<Vec<Line>, String> {
+    #[derive(Debug, Clone, Copy)]
+    struct SignedCoord {
+	x: isize,
+	y: isize,
+    }
+
     let mut lines = Vec::new();
 
     let mut state = axiom.to_owned();
     for _ in 0..n { state = advance_l_system(&state, rules); } // Get final state
 
-    let mut pos = start_pos;
+    let mut pos = SignedCoord { x: start_pos.x as isize, y: start_pos.y as isize };
     let mut direction = start_direction;
     for c in state.chars() {
 	if let Some(turtl) = turtle.get(&c) {
 	    match turtl {
 		LSystemTurtle::DrawForward(lambda) => {
-		    let end = Coord {
-			x: (pos.x as f64 + line_length as f64 * lambda * direction.cos()).round() as usize,
-			y: (pos.y as f64 + line_length as f64 * lambda * direction.sin()).round() as usize,
+		    let end = SignedCoord {
+			x: (pos.x as f64 + line_length as f64 * lambda * direction.cos()).round() as isize,
+			y: (pos.y as f64 + line_length as f64 * lambda * direction.sin()).round() as isize,
 		    };
-		    lines.push(Line { a: pos, b: end });
+		    lines.push((pos, end));
 		    pos = end;
 		},
 		LSystemTurtle::Rotate(theta) => direction += theta * TAU / 360.0,
 		LSystemTurtle::Advance(lambda) => { // Same code as draw forwards but without pushing the line
-		    let end = Coord {
-			x: (pos.x as f64 + line_length as f64 * lambda * direction.cos()).round() as usize,
-			y: (pos.y as f64 + line_length as f64 * lambda * direction.sin()).round() as usize,
+		    let end = SignedCoord {
+			x: (pos.x as f64 + line_length as f64 * lambda * direction.cos()).round() as isize,
+			y: (pos.y as f64 + line_length as f64 * lambda * direction.sin()).round() as isize,
 		    };
-		    lines.push(Line { a: pos, b: end });
+		    lines.push((pos, end));
 		    pos = end;
 		}
 		LSystemTurtle::DoNothing => { },
 	    }
 	} else {
-	    //return Err(format!("Variable/constant {c} has no assigned turtle action"));
-	     { } // If it has nothing, we assume they meant to do nothing
+	    { } // If it has nothing, we assume they meant to do nothing
 	}
     }
 
+    let norm = |p: SignedCoord | Coord {
+	x: p.x.max(0) as usize, //if p.x < 0 { 0 } else { p.x as usize },
+	y: p.y.max(0) as usize, //if p.y < 0 { 0 } else { p.y as usize },
+    };
+    let lines = lines.into_iter().map(|(p1, p2)| Line { a: norm(p1), b: norm(p2) }).collect();
 
     Ok(lines)
 } 
