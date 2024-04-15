@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 console_error_panic_hook = "0.1.7"
-ppmitzador = { git = "https://github.com/amatgil/ppmitzador" }
 
 serde = { version = "1.0.197", features = ["derive"] }
 serde-wasm-bindgen = "0.6.5"

@@ -74,8 +74,8 @@ fn pythagorean_tree_go(n: usize, shapes: &mut Shapes, theta: f64, base_line: Lin
         // a ---- b
         let a = base_line.a;
         let b = base_line.b;
-        let d = rotate_point_around_pivot(b, a, TAU/4.0);
-        let c = rotate_point_around_pivot(a, b, -TAU/4.0);
+        let d = b.rotate_around_pivot(a, TAU/4.0);
+        let c = a.rotate_around_pivot(b, -TAU/4.0);
         
         Square { a, b, c, d}
     };
@@ -88,8 +88,8 @@ fn pythagorean_tree_go(n: usize, shapes: &mut Shapes, theta: f64, base_line: Lin
         let a = q.d;
         let b = q.c;
         let c = {
-            let extended = lerp_c(a, b, theta.cos());
-            rotate_point_around_pivot(extended, a, -theta)
+            let extended = a.lerp_c(&b, theta.cos());
+            extended.rotate_around_pivot(a, -theta)
         };
 
         Triangle { a, b, c }

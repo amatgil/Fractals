@@ -42,13 +42,13 @@ fn get_flake_points(n: usize, anti: bool) -> Vec<Coord> {
             let a = pair[0];
             let b = pair[1];
 
-            let c = lerp_c(a, b, 0.5 / (1.0 + (THETA / 2.0).sin()));
-            let e = lerp_c(a, b, 1.0 - 0.5 / (1.0 + (THETA / 2.0).sin()));
+            let c = a.lerp_c(&b, 0.5 / (1.0 + (THETA / 2.0).sin()));
+            let e = a.lerp_c(&b, 1.0 - 0.5 / (1.0 + (THETA / 2.0).sin()));
 
             // place d |c-a|*cos(theta/2) units above the midpoint of a, b
             let d = {
                 // find the midpoint of a and b
-                let mid = lerp_c(a, b, 0.5);
+                let mid = a.lerp_c(&b, 0.5);
 
                 // find vector from a to c
                 let ca_vec_x = (c.x as f64 - a.x as f64) * if anti { -1.0 } else { 1.0 };

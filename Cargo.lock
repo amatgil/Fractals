@@ -29,7 +29,6 @@ name = "fractals"
 version = "0.2.0"
 dependencies = [
  "console_error_panic_hook",
- "ppmitzador",
  "serde",
  "serde-wasm-bindgen",
  "wasm-bindgen",
@@ -55,11 +54,6 @@ name = "once_cell"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3fdb12b2476b595f9358c5161aa467c2438859caa136dec86c26fdd2efe17b92"
-
-[[package]]
-name = "ppmitzador"
-version = "0.1.0"
-source = "git+https://github.com/amatgil/ppmitzador#272c60f89db95321754119e1801ebb9d9c93b182"
 
 [[package]]
 name = "proc-macro2"

@@ -42,8 +42,8 @@ fn tree_go(n: usize, v: &mut Vec<Line>, theta: f64, branch_multiplier: f64, r: L
 	    y: (r.b.y as f64 + (r.b.y as f64 * branch_multiplier) - (r.a.y as f64 * branch_multiplier)).round() as usize,
     };
 
-    let p1 = rotate_point_around_pivot(e, r.b, -theta);
-    let p2 = rotate_point_around_pivot(e, r.b, theta);
+    let p1 = e.rotate_around_pivot(r.b, -theta);
+    let p2 = e.rotate_around_pivot(r.b, theta);
 
     let l1 = Line { a: r.b.clone(), b: p1 };
     let l2 = Line { a: r.b, b: p2 };
